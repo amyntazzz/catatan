@@ -13,12 +13,24 @@
 :root[data-tema=senja]{--bg:#F6E7DC;--card:#FCF4EC;--ink:#3B2A24;--mute:#7A5F54;--line:#E6CFC0;--sun:#E0906B;--warn:#D9962B;--in:#3C7D5E;--out:#B3402F;--inbg:#E1EFE4;--outbg:#F7DBD2;--field:#F6E7DC;--h1:#E8A27E;--h2:#D27B55;--hink:#3B1E12;--hi:59,30,18;--ring:252,244,236;--pbg:#FCF4EC;--pink:#3B2A24;--acc:#3B1E12;}
 :root[data-tema=hutan]{--bg:#E4EDE1;--card:#F3F8F1;--ink:#1F3A2A;--mute:#55705E;--line:#CBDAC8;--sun:#6FA38A;--warn:#D9962B;--in:#2F7D4F;--out:#B34A38;--inbg:#D9EBDD;--outbg:#F4DDD6;--field:#E4EDE1;--h1:#6FA38A;--h2:#4F8068;--hink:#0F2A1B;--hi:15,42,27;--ring:243,248,241;--pbg:#F3F8F1;--pink:#0F2A1B;--acc:#0F2A1B;}
 :root[data-tema=lavender]{--bg:#ECE8F4;--card:#F7F5FB;--ink:#2B2447;--mute:#62597F;--line:#D6CFE6;--sun:#9B8AC4;--warn:#D9962B;--in:#2E7D6B;--out:#B04560;--inbg:#DAEEE7;--outbg:#F5DCE3;--field:#ECE8F4;--h1:#A99AD0;--h2:#8574B5;--hink:#1E1638;--hi:30,22,56;--ring:247,245,251;--pbg:#F7F5FB;--pink:#2B2447;--acc:#1E1638;}
+:root[data-tema=samudra]{color-scheme:light;--bg:#E3EEF6;--card:#F3F8FC;--ink:#12304A;--mute:#4D6A82;--line:#C9DAE8;--sun:#4A90C2;--warn:#D9962B;--in:#1F7A63;--out:#BC4A3A;--inbg:#D5EBE3;--outbg:#F6DDD7;--field:#E3EEF6;--h1:#5BA3D0;--h2:#3B7FB0;--hink:#08213A;--hi:8,33,58;--ring:243,248,252;--pbg:#F3F8FC;--pink:#08213A;--acc:#08213A;}
+:root[data-tema=mawar]{color-scheme:light;--bg:#F8E6EA;--card:#FDF3F5;--ink:#4A1F2E;--mute:#86505F;--line:#EBCDD5;--sun:#D9708A;--warn:#D9962B;--in:#3C7D5E;--out:#A8323F;--inbg:#E1EFE4;--outbg:#F7D9DC;--field:#F8E6EA;--h1:#E88CA4;--h2:#CC5D7C;--hink:#3E0F1D;--hi:62,15,29;--ring:253,243,245;--pbg:#FDF3F5;--pink:#3E0F1D;--acc:#3E0F1D;}
+:root[data-tema=mocha]{color-scheme:light;--bg:#EADFD2;--card:#F6EFE6;--ink:#3A2A1E;--mute:#7A6452;--line:#D8C7B3;--sun:#B98A5E;--warn:#D9962B;--in:#3F7A57;--out:#B0452F;--inbg:#DEEBDD;--outbg:#F4DAD0;--field:#EADFD2;--h1:#C79A6D;--h2:#A57548;--hink:#2B1B10;--hi:43,27,16;--ring:246,239,230;--pbg:#F6EFE6;--pink:#2B1B10;--acc:#2B1B10;}
+:root[data-tema=mint]{color-scheme:light;--bg:#E0F3EC;--card:#F1FAF6;--ink:#123A32;--mute:#4F7A6E;--line:#C3E3D8;--sun:#4FBF9F;--warn:#D9962B;--in:#1E8060;--out:#C0503C;--inbg:#CDEEE0;--outbg:#F6DED7;--field:#E0F3EC;--h1:#62CDB0;--h2:#3BA98A;--hink:#07271F;--hi:7,39,31;--ring:241,250,246;--pbg:#F1FAF6;--pink:#07271F;--acc:#07271F;}
+:root[data-tema=galaksi]{color-scheme:dark;--bg:#1A1530;--card:#241D42;--ink:#EDE8FF;--mute:#A9A0CF;--line:#38305E;--sun:#9D7BFF;--warn:#E0A84A;--in:#7FE0C0;--out:#FF8FA3;--inbg:#1F3B3F;--outbg:#4A2338;--field:#1A1530;--h1:#5B3FC2;--h2:#3A2790;--hink:#F3EEFF;--hi:243,238,255;--ring:157,123,255;--pbg:#1A1530;--pink:#EDE8FF;--acc:#1A0F3A;}
+:root[data-tema=bara]{color-scheme:dark;--bg:#231A14;--card:#2E221A;--ink:#F6E8DA;--mute:#BFA48E;--line:#46342A;--sun:#F08A4B;--warn:#E0A84A;--in:#8FD6A8;--out:#FF8E78;--inbg:#2A3E30;--outbg:#4A2A22;--field:#231A14;--h1:#B85A25;--h2:#8A3F14;--hink:#FFF1E4;--hi:255,241,228;--ring:240,138,75;--pbg:#231A14;--pink:#F6E8DA;--acc:#2B1308;}
+.themes{flex-wrap:wrap}
+.pform{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px}
+.pf-row{display:flex;gap:8px;flex-wrap:wrap}
+.pf-row input{flex:1;min-width:180px;max-width:320px}
+.pf-row .btn{padding:10px 18px}
+.pquick{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.pquick:empty{display:none}
+.btn.danger{background:var(--out);color:#fff}
 .bar2{display:flex;flex-wrap:wrap;gap:10px 16px;justify-content:space-between;align-items:center;margin-bottom:14px}
 .themes{display:flex;gap:10px;align-items:center}
 .themes button{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}
 .themes button[aria-pressed=true]{border-color:var(--ink);box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--ink)}
-.akun{display:flex;gap:10px;align-items:center;font-size:.85rem;color:var(--mute)}
-.akun span{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .edit2{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:5px 14px;font-weight:700;cursor:pointer;color:var(--ink)}
 .pencatat{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .pencatat select{width:auto;padding:8px 14px;font-weight:700;border-radius:99px}
@@ -152,6 +164,7 @@ th{font-size:.78rem;color:var(--mute)}
   <div class="step" id="stepper" role="group" aria-label="Pilih bulan"><button id="prev" aria-label="Bulan sebelumnya">‹</button><span id="blabel"></span><button id="next" aria-label="Bulan berikutnya">›</button></div>
 </header>
 <div class="bar2"><div class="themes" id="themes" role="group" aria-label="Pilih tema"></div><div class="pencatat"><span class="hint" style="margin:0">Pencatat</span><select id="profil" aria-label="Pilih pencatat"></select><button type="button" class="edit2" id="padd" aria-label="Tambah pencatat">＋ Tambah</button><button type="button" class="edit2" id="pren">Ubah nama</button><button type="button" class="edit2" id="pdel">Hapus</button></div></div>
+<div class="pform" id="pform" hidden><div class="pf-row"><input id="pnama" maxlength="30" placeholder="Nama pencatat" aria-label="Nama pencatat" autocomplete="off"><button type="button" class="btn" id="psimpan">Simpan</button><button type="button" class="btn g" id="pbatal">Batal</button></div><div class="pquick" id="pquick"></div><p class="hint" id="phint"></p></div>
 <div class="notice" id="notice" role="alert"></div>
 <div id="app">
 
@@ -550,7 +563,7 @@ $('csv').onclick=function(){
   }).then(function(){btn.disabled=false;btn.textContent='Unduh laporan Excel'});
 };
 
-var TEMA=[['pasir','Pasir & Laut','#EFE8DD','#76ABAE'],['malam','Malam','#17282A','#76ABAE'],['senja','Senja','#F6E7DC','#E0906B'],['hutan','Hutan','#E4EDE1','#6FA38A'],['lavender','Lavender','#ECE8F4','#9B8AC4']];
+var TEMA=[['pasir','Pasir & Laut','#EFE8DD','#76ABAE'],['samudra','Samudra','#E3EEF6','#4A90C2'],['mint','Mint Segar','#E0F3EC','#4FBF9F'],['hutan','Hutan','#E4EDE1','#6FA38A'],['senja','Senja','#F6E7DC','#E0906B'],['mocha','Mocha','#EADFD2','#B98A5E'],['mawar','Mawar','#F8E6EA','#D9708A'],['lavender','Lavender','#ECE8F4','#9B8AC4'],['malam','Malam','#17282A','#76ABAE'],['galaksi','Galaksi','#1A1530','#9D7BFF'],['bara','Bara','#231A14','#F08A4B']];
 function setTema(id){
   document.documentElement.setAttribute('data-tema',id);
   try{localStorage.setItem('kr-tema',id)}catch(e){}
@@ -562,21 +575,45 @@ setTema(document.documentElement.getAttribute('data-tema')||'pasir');
 
 function simpanProfil(){try{localStorage.setItem('kr-profil',profil)}catch(e){}sig='';$('bkat').dataset.s=''}
 function ada(nm){var l=nm.toLowerCase();for(var i=0;i<profiles.length;i++)if(profiles[i].toLowerCase()===l)return profiles[i];return null}
-$('profil').onchange=function(){profil=this.value;simpanProfil();$('notice').textContent='';jalan(Promise.resolve())};
-$('padd').onclick=function(){
-  var nm=bersih(prompt('Nama pencatat baru (contoh: Ayah, Ibu, Anak):')||'');if(!nm)return;
-  var ex=ada(nm);if(ex){profil=ex;simpanProfil();jalan(Promise.resolve());return}
-  $('notice').textContent='';jalan(store.addProfil(nm).then(function(){profil=nm;simpanProfil()}));
-};
-$('pren').onclick=function(){
-  var nm=bersih(prompt('Nama baru untuk "'+profil+'":',profil)||'');if(!nm||nm===profil)return;
-  var ex=ada(nm);if(ex&&ex!==profil){$('notice').textContent='Nama "'+nm+'" sudah dipakai pencatat lain.';return}
-  var o=profil;$('notice').textContent='';jalan(store.renProfil(o,nm).then(function(){profil=nm;simpanProfil()}));
-};
-$('pdel').onclick=function(){
-  if(profiles.length<=1){$('notice').textContent='Minimal harus ada satu pencatat.';return}
-  if(!confirm('Hapus pencatat "'+profil+'" beserta semua transaksi, anggaran, dan saldo awalnya? Tindakan ini tidak bisa dibatalkan.'))return;
-  var o=profil;$('notice').textContent='';jalan(store.delProfil(o).then(function(){profil='';simpanProfil()}));
+$('profil').onchange=function(){tutupP();profil=this.value;simpanProfil();$('notice').textContent='';jalan(Promise.resolve())};
+var pmode='';
+function tutupP(){pmode='';$('pform').hidden=true}
+function bukaP(m){
+  pmode=m;$('notice').textContent='';$('pform').hidden=false;
+  var inp=$('pnama'),q=$('pquick'),h=$('phint'),sv=$('psimpan');
+  inp.hidden=(m==='del');q.innerHTML='';sv.className='btn';
+  if(m==='add'){
+    inp.value='';sv.textContent='Tambah';
+    h.textContent='Setiap pencatat punya transaksi, anggaran, dan saldo awal sendiri.';
+    inp.focus();
+  }else if(m==='ren'){
+    inp.value=profil;sv.textContent='Simpan nama';h.textContent='Mengubah nama pencatat "'+profil+'".';inp.focus();inp.select();
+  }else{
+    if(profiles.length<=1){tutupP();$('notice').textContent='Minimal harus ada satu pencatat.';return}
+    sv.textContent='Ya, hapus';sv.className='btn danger';
+    h.textContent='Hapus pencatat "'+profil+'" beserta semua transaksi, anggaran, dan saldo awalnya? Tindakan ini tidak bisa dibatalkan.';
+  }
+}
+function tambahP(nm){
+  nm=bersih(nm||'');if(!nm)return;
+  var ex=ada(nm);tutupP();
+  if(ex){profil=ex;simpanProfil();jalan(Promise.resolve());return}
+  jalan(store.addProfil(nm).then(function(){profil=nm;simpanProfil()}));
+}
+$('padd').onclick=function(){bukaP('add')};
+$('pren').onclick=function(){bukaP('ren')};
+$('pdel').onclick=function(){bukaP('del')};
+$('pbatal').onclick=tutupP;
+$('pquick').onclick=function(e){var n=e.target.getAttribute&&e.target.getAttribute('data-n');if(n)tambahP(n)};
+$('pnama').onkeydown=function(e){if(e.key==='Enter')$('psimpan').onclick();else if(e.key==='Escape')tutupP()};
+$('psimpan').onclick=function(){
+  if(pmode==='add'){tambahP($('pnama').value);return}
+  if(pmode==='ren'){
+    var nm=bersih($('pnama').value);if(!nm||nm===profil){tutupP();return}
+    var ex=ada(nm);if(ex&&ex!==profil){$('notice').textContent='Nama "'+nm+'" sudah dipakai pencatat lain.';return}
+    var o=profil;tutupP();jalan(store.renProfil(o,nm).then(function(){profil=nm;simpanProfil()}));return;
+  }
+  if(pmode==='del'){var o2=profil;tutupP();jalan(store.delProfil(o2).then(function(){profil='';simpanProfil()}))}
 };
 setJenis('out');
 store.load().then(function(){

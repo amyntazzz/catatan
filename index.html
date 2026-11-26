@@ -261,7 +261,6 @@ $('simpan').onclick=function(){
   $('err').textContent='';$('notice').textContent='';
   var k=$('kat').value;if(k==='__baru'){var nm=bersih($('kustom').value);k=nm?normKat(nm):'Lainnya'}
   var r={jenis:jenis,jumlah:n,kategori:k,tanggal:$('tanggal').value,ket:$('ket').value.trim(),dibuat:Date.now()};
-  if(sb){r.dibuat=new Date().toISOString()}
   $('jumlah').value='';$('ket').value='';$('kustom').value='';
   bulan=r.tanggal.slice(0,7);
   jalan(store.add(r));$('jumlah').focus();
@@ -293,7 +292,7 @@ function agg(b){
     else{r.tout+=n;r.per[t.kategori]=(r.per[t.kategori]||0)+n;var d=+t.tanggal.slice(8,10);r.hari[d]=(r.hari[d]||0)+n;r.items.push(t)}
   });
   r.items.sort(function(a,c){return c.jumlah-a.jumlah});
-  r.list.sort(function(a,c){return c.tanggal.localeCompare(a.tanggal)||String(c.dibuat).localeCompare(String(a.dibuat))});
+  r.list.sort(function(a,c){return c.tanggal.localeCompare(a.tanggal)||(Number(c.dibuat)||0)-(Number(a.dibuat)||0)});
   return r;
 }
 function pcls(q){return q>100?'x':(q>=80?'w':'')}

@@ -34,6 +34,15 @@ header{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-
 .hero::after{width:220px;height:220px;right:130px;bottom:-130px}
 .hero>*{position:relative;z-index:1}
 .hero small{opacity:.8}
+.total{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px;padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid rgba(16,40,42,.22)}
+.total small{width:100%;font-weight:700;opacity:.85}
+.total b{font:800 clamp(1.6rem,6vw,2.2rem)/1.1 "Bricolage Grotesque",sans-serif;letter-spacing:-.02em}
+.total span{font-size:.82rem;opacity:.8}
+.edit{border:1px solid rgba(16,40,42,.35);background:none;border-radius:99px;padding:4px 12px;font-size:.78rem;font-weight:700;cursor:pointer;color:#10282A}
+.edit:hover{background:rgba(239,232,221,.45)}
+.sform{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 16px}
+.sform input{flex:1;min-width:200px;max-width:420px;color:#10282A}
+.sform .btn{background:#10282A;color:#EFE8DD}
 .big{font-size:clamp(2.4rem,9vw,4rem);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin:2px 0 14px;word-break:break-word}
 .meter{height:10px;border-radius:5px;background:rgba(16,40,42,.18);max-width:440px;overflow:hidden}
 .meter i{display:block;height:100%;background:#10282A;border-radius:5px;transition:width .5s}
@@ -131,6 +140,8 @@ th{font-size:.78rem;color:var(--mute)}
 <div class="notice" id="notice" role="alert"></div>
 
 <section class="hero" aria-live="polite">
+  <div class="total"><small>Saldo dipegang saat ini</small><b id="total">Rp 0</b><span id="totalnote"></span><button type="button" class="edit" id="btnsaldo">Atur saldo awal</button></div>
+  <div class="sform" id="fsaldo" hidden><input id="isaldo" inputmode="numeric" placeholder="Uang yang sudah dipegang sebelum mencatat" aria-label="Saldo awal (Rp)" autocomplete="off"><button type="button" class="btn" id="ssaldo">Simpan saldo awal</button></div>
   <small id="hlabel">Sisa uang bulan ini</small>
   <div class="big" id="saldo">Rp 0</div>
   <div class="meter" aria-hidden="true"><i id="meter" style="width:0"></i></div>
@@ -203,7 +214,7 @@ var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':
 var ym=function(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
 var shift=function(b,n){var p=b.split('-');return ym(new Date(+p[0],+p[1]-1+n,1))};
 var bln=function(b,o){return new Date(b+'-01T00:00:00').toLocaleDateString('id-ID',o||{month:'long',year:'numeric'})};
-var now=new Date(),jenis='out',bulan=ym(now),data=[],bud={},sig='';
+var now=new Date(),jenis='out',bulan=ym(now),data=[],bud={},sig='',saldoAwal=0;
 $('tanggal').value=ym(now)+'-'+String(now.getDate()).padStart(2,'0');
 
 function setStatus(t,c){var s=$('status');s.textContent=t;s.className='chip '+(c||'')}
@@ -215,8 +226,8 @@ var store={
     if(sb){
       var a=await sb.from('transaksi').select('*').order('tanggal',{ascending:false}),b=await sb.from('anggaran').select('*');
       if(a.error)throw a.error;if(b.error)throw b.error;
-      data=a.data;bud={};b.data.forEach(function(r){bud[r.kunci]=Number(r.jumlah)});
-    }else{data=lsGet('kr-trx',[]);bud=lsGet('kr-bud',{})}
+      data=a.data;bud={};saldoAwal=0;b.data.forEach(function(r){if(r.kunci==='__saldo_awal')saldoAwal=Number(r.jumlah)||0;else bud[r.kunci]=Number(r.jumlah)});
+    }else{data=lsGet('kr-trx',[]);bud=lsGet('kr-bud',{});saldoAwal=Number(localStorage.getItem('kr-saldo'))||0}
   },
   add:async function(r){
     if(sb){var x=await sb.from('transaksi').insert(r);if(x.error)throw x.error}
@@ -225,6 +236,12 @@ var store={
   del:async function(id){
     if(sb){var x=await sb.from('transaksi').delete().eq('id',id);if(x.error)throw x.error}
     else{data=data.filter(function(t){return String(t.id)!==id});localStorage.setItem('kr-trx',JSON.stringify(data))}
+  },
+  setSaldo:async function(n){
+    if(sb){
+      var x=n>0?await sb.from('anggaran').upsert({kunci:'__saldo_awal',jumlah:n}):await sb.from('anggaran').delete().eq('kunci','__saldo_awal');
+      if(x.error)throw x.error;
+    }else{saldoAwal=n;localStorage.setItem('kr-saldo',String(n))}
   },
   setBud:async function(nb){
     if(sb){
@@ -279,6 +296,9 @@ $('salin').onclick=function(){
   if(!c){$('notice').textContent='Tidak ada anggaran bulan lalu yang berbeda untuk disalin.';return}
   jalan(store.setBud(nb));
 };
+$('isaldo').oninput=fmt;
+$('btnsaldo').onclick=function(){var f=$('fsaldo');f.hidden=!f.hidden;if(!f.hidden){$('isaldo').value=saldoAwal?saldoAwal.toLocaleString('id-ID'):'';$('isaldo').focus()}};
+$('ssaldo').onclick=function(){var n=Number($('isaldo').value.replace(/\D/g,''))||0;$('notice').textContent='';$('fsaldo').hidden=true;jalan(store.setSaldo(n))};
 $('prev').onclick=function(){bulan=shift(bulan,-1);render()};$('next').onclick=function(){bulan=shift(bulan,1);render()};
 function tab(l){$('v-catat').hidden=l;$('v-lap').hidden=!l;$('t-catat').setAttribute('aria-selected',!l);$('t-lap').setAttribute('aria-selected',l)}
 $('t-catat').onclick=function(){tab(false)};$('t-lap').onclick=function(){tab(true)};
@@ -303,6 +323,11 @@ function render(){
   if(kustom(jenis).join('|')+jenis!==sig){sig=kustom(jenis).join('|')+jenis;isiKat()}
   if(!$('bkat').options.length||bKustom().join('|')!==($('bkat').dataset.s||'')){isiB();$('bkat').dataset.s=bKustom().join('|')}
   $('blabel').textContent=bln(b);$('hlabel').textContent='Sisa uang '+bln(b);
+  var ai=0,ao=0;
+  data.forEach(function(t){var v=Number(t.jumlah)||0;if(t.jenis==='in')ai+=v;else ao+=v});
+  var sd=saldoAwal+ai-ao;
+  $('total').textContent=(sd<0?'−':'')+rp(Math.abs(sd));
+  $('totalnote').textContent='Saldo awal '+rpk(saldoAwal)+' + pemasukan '+rpk(ai)+' − pengeluaran '+rpk(ao);
   var net=r.tin-r.tout,pct=r.tin?Math.min(100,Math.round(r.tout/r.tin*100)):(r.tout?100:0);
   $('tin').textContent=rp(r.tin);$('tout').textContent=rp(r.tout);
   $('saldo').textContent=(net<0?'−':'')+rp(Math.abs(net));

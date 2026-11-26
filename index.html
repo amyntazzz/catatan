@@ -174,7 +174,7 @@ th{font-size:.78rem;color:var(--mute)}
 </div>
 
 <div id="v-lap" hidden>
-  <div class="actions"><button class="btn" id="csv">Unduh CSV bulan ini</button><span class="hint" style="margin:0">Bisa dibuka di Excel atau Google Sheets.</span></div>
+  <div class="actions"><button class="btn" id="csv">Unduh laporan Excel</button><span class="hint" style="margin:0">Berisi ringkasan, anggaran, daftar transaksi, dan tren 6 bulan untuk bulan yang dipilih.</span></div>
   <section class="card" style="margin-bottom:16px"><h2>Catatan bulan ini</h2><ul class="insight" id="insight"></ul></section>
   <div class="stats" id="stats"></div>
   <div class="two">
@@ -398,13 +398,105 @@ function laporan(b,r,pb,pv,ks){
   $('tren').innerHTML='<div class="trend">'+ag.map(function(a,i){return '<div class="grp"><div class="pair"><i style="height:'+a.tin/mt*100+'%" title="'+esc(bln(ms[i])+' pemasukan: '+rp(a.tin))+'"></i><i class="o" style="height:'+a.tout/mt*100+'%" title="'+esc(bln(ms[i])+' pengeluaran: '+rp(a.tout))+'"></i></div></div>'}).join('')+'</div><div class="lbls">'+ms.map(function(m){return '<span'+(m===b?' style="font-weight:800;color:var(--ink)"':'')+'>'+esc(bln(m,{month:'short'}))+'</span>'}).join('')+'</div>';
 
   $('top').innerHTML=r.items.length?r.items.slice(0,5).map(function(t){return '<li class="tx"><div class="dot out" aria-hidden="true">'+(IKON[t.kategori]||'📦')+'</div><div class="m"><b>'+esc(t.ket||t.kategori||'')+'</b><span>'+esc(t.kategori||'')+'</span></div><div class="amt out">−'+rp(t.jumlah)+'</div></li>'}).join(''):'<li class="empty">Belum ada pengeluaran.</li>';
+  lap={b:b,pb:pb,r:r,pv:pv,kat:kat,ins:ins,ag:ag,ms:ms,el:el,avg:avg};
 }
 
+var lap=null;
+function muatExcel(){
+  if(window.ExcelJS)return Promise.resolve();
+  return new Promise(function(ok,no){var sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';sc.onload=ok;sc.onerror=function(){no(new Error('exceljs'))};document.head.appendChild(sc)});
+}
+function cmp(c,p){if(!p)return 'belum ada data bulan lalu';var q=Math.round((c-p)/p*100);return q?(q>0?'naik ':'turun ')+Math.abs(q)+'% dibanding bulan lalu':'sama dengan bulan lalu'}
 $('csv').onclick=function(){
-  var r=agg(bulan),q=function(s){return '"'+String(s==null?'':s).replace(/"/g,'""')+'"'};
-  var rows=[['Tanggal','Jenis','Kategori','Keterangan','Jumlah'].join(',')].concat(r.list.slice().reverse().map(function(t){return [t.tanggal,t.jenis==='in'?'Pemasukan':'Pengeluaran',q(t.kategori),q(t.ket),t.jumlah].join(',')}));
-  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+rows.join('\n')],{type:'text/csv'}));a.download='keuangan-'+bulan+'.csv';
-  document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},3000);
+  if(!lap)return;
+  var L=lap,b=L.b,r=L.r,pv=L.pv,btn=this;
+  $('notice').textContent='';btn.disabled=true;btn.textContent='Menyiapkan file…';
+  muatExcel().then(function(){
+    var wb=new ExcelJS.Workbook();wb.creator='Catatan Keuangan';
+    var RP='"Rp" #,##0;[Red]-"Rp" #,##0',PC='0%';
+    function hdr(row){row.eachCell({includeEmpty:true},function(c){c.font={bold:true,color:{argb:'FF10282A'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF76ABAE'}};c.alignment={vertical:'middle',horizontal:'center',wrapText:true}});row.height=24}
+    function nf(row,cols,f){cols.forEach(function(i){row.getCell(i).numFmt=f})}
+    var ai=0,ao=0;data.forEach(function(t){var v=Number(t.jumlah)||0;if(t.jenis==='in')ai+=v;else ao+=v});
+
+    var s1=wb.addWorksheet('Ringkasan');
+    s1.columns=[{width:38},{width:20},{width:44}];
+    s1.mergeCells('A1:C1');s1.getCell('A1').value='Laporan Keuangan — '+bln(b);
+    s1.getCell('A1').font={bold:true,size:16,color:{argb:'FF1E3638'}};s1.getRow(1).height=30;
+    s1.addRow([]);
+    hdr(s1.addRow(['Ringkasan bulan ini','Nilai','Keterangan']));
+    var rIn=s1.addRow(['Pemasukan',r.tin,cmp(r.tin,pv.tin)]);
+    var rOut=s1.addRow(['Pengeluaran',r.tout,cmp(r.tout,pv.tout)]);
+    var rNet=s1.addRow(['Selisih (pemasukan − pengeluaran)',{formula:'B'+rIn.number+'-B'+rOut.number,result:r.tin-r.tout},'']);
+    var rSv=s1.addRow(['Persentase pemasukan yang disisihkan',{formula:'IF(B'+rIn.number+'>0,B'+rNet.number+'/B'+rIn.number+',0)',result:r.tin?(r.tin-r.tout)/r.tin:0},'']);
+    var rAv=s1.addRow(['Rata-rata pengeluaran per hari',L.el?L.avg:0,L.el?'dihitung dari '+L.el+' hari':'bulan belum dimulai']);
+    s1.addRow(['Jumlah transaksi',r.n,r.items.length+' pengeluaran, '+(r.n-r.items.length)+' pemasukan']);
+    [rIn,rOut,rNet,rAv].forEach(function(x){nf(x,[2],RP)});nf(rSv,[2],PC);
+    s1.addRow([]);
+    hdr(s1.addRow(['Saldo keseluruhan','Nilai','Keterangan']));
+    var sA=s1.addRow(['Saldo awal',saldoAwal,'']);
+    var sI=s1.addRow(['Total pemasukan (semua bulan)',ai,'']);
+    var sO=s1.addRow(['Total pengeluaran (semua bulan)',ao,'']);
+    var sS=s1.addRow(['Saldo dipegang saat ini',{formula:'B'+sA.number+'+B'+sI.number+'-B'+sO.number,result:saldoAwal+ai-ao},'Saldo awal + pemasukan − pengeluaran']);
+    [sA,sI,sO,sS].forEach(function(x){nf(x,[2],RP)});sS.font={bold:true};
+    s1.addRow([]);
+    var hr=s1.addRow(['Catatan bulan ini']);s1.mergeCells('A'+hr.number+':C'+hr.number);hdr(hr);
+    L.ins.forEach(function(x){var ir=s1.addRow([x]);s1.mergeCells('A'+ir.number+':C'+ir.number);ir.getCell(1).alignment={wrapText:true,vertical:'top'};ir.height=32});
+
+    var s2=wb.addWorksheet('Anggaran');
+    s2.columns=[{width:28},{width:16},{width:16},{width:16},{width:12},{width:20},{width:12}];
+    hdr(s2.addRow(['Kategori','Anggaran','Terpakai','Sisa','Pemakaian','Terpakai bulan lalu','Perubahan']));
+    L.kat.forEach(function(k){
+      var sp=r.per[k]||0,bd=bget(k,b),pp=pv.per[k]||0,n=s2.rowCount+1;
+      var row=s2.addRow([k,bd||null,sp,bd?{formula:'B'+n+'-C'+n,result:bd-sp}:null,bd?{formula:'C'+n+'/B'+n,result:sp/bd}:null,pp,pp?{formula:'(C'+n+'-F'+n+')/F'+n,result:(sp-pp)/pp}:null]);
+      nf(row,[2,3,4,6],RP);nf(row,[5,7],PC);
+      if(bd&&sp>bd)row.getCell(4).font={bold:true,color:{argb:'FFB24B35'}};
+    });
+    if(s2.rowCount>1){
+      var last=s2.rowCount,n2=last+1;
+      var tr=s2.addRow(['Total','','','','','','']);
+      tr.getCell(2).value={formula:'SUM(B2:B'+last+')'};
+      tr.getCell(3).value={formula:'SUM(C2:C'+last+')'};
+      tr.getCell(4).value={formula:'B'+n2+'-SUMIF(B2:B'+last+',">0",C2:C'+last+')'};
+      tr.getCell(5).value={formula:'IF(B'+n2+'>0,SUMIF(B2:B'+last+',">0",C2:C'+last+')/B'+n2+',0)'};
+      tr.getCell(6).value={formula:'SUM(F2:F'+last+')'};
+      nf(tr,[2,3,4,6],RP);nf(tr,[5],PC);tr.font={bold:true};
+      s2.addRow(['Catatan: Sisa dan Pemakaian pada baris Total hanya menghitung kategori yang punya anggaran.']).font={italic:true,color:{argb:'FF4F6667'}};
+    }
+    s2.views=[{state:'frozen',ySplit:1}];
+
+    var s3=wb.addWorksheet('Transaksi');
+    s3.columns=[{width:14},{width:14},{width:26},{width:36},{width:18}];
+    hdr(s3.addRow(['Tanggal','Jenis','Kategori','Keterangan','Jumlah']));
+    r.list.slice().reverse().forEach(function(t){
+      var row=s3.addRow([new Date(Date.UTC(+t.tanggal.slice(0,4),+t.tanggal.slice(5,7)-1,+t.tanggal.slice(8,10))),t.jenis==='in'?'Pemasukan':'Pengeluaran',t.kategori||'',t.ket||'',Number(t.jumlah)||0]);
+      row.getCell(1).numFmt='dd/mm/yyyy';row.getCell(5).numFmt=RP;
+    });
+    var tl=s3.rowCount;
+    if(tl>1){
+      s3.autoFilter='A1:E'+tl;s3.addRow([]);
+      var a1=s3.addRow(['','','','Total pemasukan',{formula:'SUMIF(B2:B'+tl+',"Pemasukan",E2:E'+tl+')'}]);
+      var a2=s3.addRow(['','','','Total pengeluaran',{formula:'SUMIF(B2:B'+tl+',"Pengeluaran",E2:E'+tl+')'}]);
+      [a1,a2].forEach(function(x){x.font={bold:true};x.getCell(5).numFmt=RP});
+    }
+    s3.views=[{state:'frozen',ySplit:1}];
+
+    var s4=wb.addWorksheet('Tren 6 Bulan');
+    s4.columns=[{width:20},{width:18},{width:18},{width:18}];
+    hdr(s4.addRow(['Bulan','Pemasukan','Pengeluaran','Selisih']));
+    L.ms.forEach(function(m,i){
+      var n=s4.rowCount+1,a=L.ag[i];
+      var row=s4.addRow([bln(m),a.tin,a.tout,{formula:'B'+n+'-C'+n,result:a.tin-a.tout}]);
+      nf(row,[2,3,4],RP);if(m===b)row.font={bold:true};
+    });
+    return wb.xlsx.writeBuffer();
+  }).then(function(buf){
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+    a.download='laporan-keuangan-'+b+'.xlsx';
+    document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},3000);
+  }).catch(function(){
+    $('notice').textContent='File Excel belum bisa dibuat. Periksa koneksi internet lalu coba lagi.';
+  }).then(function(){btn.disabled=false;btn.textContent='Unduh laporan Excel'});
 };
 
 setJenis('out');

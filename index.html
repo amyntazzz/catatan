@@ -239,8 +239,8 @@ var store={
   },
   setSaldo:async function(n){
     if(sb){
-      var x=n>0?await sb.from('anggaran').upsert({kunci:'__saldo_awal',jumlah:n}):await sb.from('anggaran').delete().eq('kunci','__saldo_awal');
-      if(x.error)throw x.error;
+      if(n>0){var x=await sb.from('anggaran').upsert({kunci:'__saldo_awal',jumlah:n});if(x.error)throw x.error}
+      else{var y=await sb.from('anggaran').delete().eq('kunci','__saldo_awal').select();if(y.error)throw y.error;if(saldoAwal>0&&!y.data.length)throw {message:'saldo awal tidak terhapus di database. Hapus lewat SQL Editor Supabase atau periksa aturan akses (RLS) tabel anggaran'}}
     }else{saldoAwal=n;localStorage.setItem('kr-saldo',String(n))}
   },
   setBud:async function(nb){

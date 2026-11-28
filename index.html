@@ -123,7 +123,7 @@ li.day:first-child{padding-top:0}
 li.tx{display:flex;gap:12px;align-items:center;padding:8px 0}
 .dot{flex:none;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:1.2rem}
 .dot.in{background:var(--inbg)}.dot.out{background:var(--outbg)}
-.m{flex:1;min-width:0}.m b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.m span{font-size:.8rem;color:var(--mute)}
+.m{flex:1;min-width:0}.m b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.m span{font-size:.8rem;color:var(--mute)}.m span.ket{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .amt{font-weight:800;white-space:nowrap}.amt.in{color:var(--in)}.amt.out{color:var(--out)}
 .del{border:0;background:none;color:var(--mute);cursor:pointer;font-size:1.2rem;padding:4px 8px;border-radius:8px}
 .del:hover{color:var(--out);background:var(--outbg)}
@@ -247,7 +247,7 @@ th{font-size:.78rem;color:var(--mute)}
 /* ====== ISI DUA BARIS INI (Supabase → Project Settings → API) ====== */
 var SUPABASE_URL='https://wnsazwafkcxlgyhrzhcf.supabase.co';
 var SUPABASE_KEY='sb_publishable_Mk_YWU0H47WKZParTGWPtw_0zUaKlHf';
-var TELEGRAM_BOT='seratmoneybot'; /* username bot dari BotFather, tanpa @ */
+var TELEGRAM_BOT='ISI_USERNAME_BOT'; /* username bot dari BotFather, tanpa @ */
 (function(){
 var sb=(window.supabase&&SUPABASE_URL.indexOf('http')===0)?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
 var $=function(i){return document.getElementById(i)};
@@ -387,7 +387,7 @@ function render(){
   r.list.forEach(function(t){
     if(t.tanggal!==last){last=t.tanggal;h+='<li class="day">'+esc(new Date(t.tanggal+'T00:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'}))+'</li>'}
     var i=t.jenis==='in';
-    h+='<li class="tx"><div class="dot '+(i?'in':'out')+'" aria-hidden="true">'+(IKON[t.kategori]||'📦')+'</div><div class="m"><b>'+esc(t.ket||t.kategori||'')+'</b><span>'+esc(t.kategori||'')+'</span></div><div class="amt '+(i?'in':'out')+'">'+(i?'+':'−')+rp(t.jumlah)+'</div><button class="del" data-id="'+esc(t.id)+'" aria-label="Hapus transaksi">×</button></li>';
+    h+='<li class="tx"><div class="dot '+(i?'in':'out')+'" aria-hidden="true">'+(IKON[t.kategori]||'📦')+'</div><div class="m" title="'+esc((t.kategori||'')+(t.ket?' – '+t.ket:''))+'"><b>'+esc(t.kategori||'Lainnya')+'</b>'+(t.ket&&String(t.ket).trim().toLowerCase()!==String(t.kategori||'').trim().toLowerCase()?'<span class="ket">'+esc(t.ket)+'</span>':'')+'</div><div class="amt '+(i?'in':'out')+'">'+(i?'+':'−')+rp(t.jumlah)+'</div><button class="del" data-id="'+esc(t.id)+'" aria-label="Hapus transaksi">×</button></li>';
   });
   $('daftar').innerHTML=h||'<li class="empty">Belum ada transaksi di bulan ini.</li>';
   laporan(b,r,pb,pv,ks);
